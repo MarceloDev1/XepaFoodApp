@@ -1,31 +1,38 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import api from '../services/axios';
+import { useAuth } from '../context/AuthContext'; 
 
 const LoginScreen = () => {
-  // Estados para armazenar o e-mail e senha digitados
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
-  // Função de login
-  const handleLogin = () => {
-    // Aqui você pode adicionar a lógica para chamar a API de autenticação
+  const handleLogin = async () => {
     if (email === "" || senha === "") {
       Alert.alert("Erro", "Por favor, preencha todos os campos.");
       return;
     }
 
-    // Exemplo de validação básica
-    if (email === "admin@xepafood.com" && senha === "123456") {
-      Alert.alert("Sucesso", "Login realizado com sucesso!");
-    } else {
-      Alert.alert("Erro", "E-mail ou senha incorretos.");
+    try {
+      const response = await api.post('/api/Usuario/Login', {
+        email: email,
+        senha: senha,
+      });
+
+      if (response.status === 200) {
+        login(response.data.user);
+        Alert.alert("Sucesso", "Login realizado com sucesso!");
+      }
+    } catch (error) {
+      console.error('Erro ao fazer login:', error);
+      Alert.alert("Erro", "E-mail ou senha incorretos ou erro na conexão.");
     }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
-
       <TextInput
         style={styles.input}
         placeholder="E-mail"
@@ -34,7 +41,6 @@ const LoginScreen = () => {
         keyboardType="email-address"
         autoCapitalize="none"
       />
-
       <TextInput
         style={styles.input}
         placeholder="Senha"
@@ -42,10 +48,7 @@ const LoginScreen = () => {
         onChangeText={setSenha}
         secureTextEntry
       />
-
       <Button title="Entrar" onPress={handleLogin} />
-
-      {/* Área para link de "Esqueceu a senha?" ou "Cadastre-se" */}
       <Text style={styles.signupText}>
         Não tem uma conta? <Text style={styles.signupLink}>Cadastre-se</Text>
       </Text>
