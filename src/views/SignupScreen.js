@@ -1,38 +1,47 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
 import api from '../services/axios';
-import { useAuth } from '../context/AuthContext';
 
-const LoginScreen = ({ navigation }) => {
-  const { login } = useAuth();
+const SignupScreen = () => {
+  const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [localizacao, setLocalizacao] = useState("");
+  const [telefone, setTelefone] = useState("");
 
-  const handleLogin = async () => {
-    if (email === "" || senha === "") {
+  const handleSignup = async () => {
+    if (!nome || !email || !senha || !localizacao || !telefone) {
       Alert.alert("Erro", "Por favor, preencha todos os campos.");
       return;
     }
 
     try {
-      const response = await api.post('/api/Usuario/Login', {
-        email: email,
-        senha: senha,
+      const response = await api.post('/api/Usuario/Cadastrar', {
+        nome,
+        email,
+        senha,
+        localizacao,
+        telefone,
       });
 
       if (response.status === 200) {
-        login(response.data.user);
-        Alert.alert("Sucesso", "Login realizado com sucesso!");
+        Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
       }
     } catch (error) {
-      console.error('Erro ao fazer login:', error);
-      Alert.alert("Erro", "E-mail ou senha incorretos ou erro na conexão.");
+      console.error('Erro ao fazer cadastro:', error);
+      Alert.alert("Erro", "Erro ao realizar o cadastro. Tente novamente.");
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Cadastro</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Nome"
+        value={nome}
+        onChangeText={setNome}
+      />
       <TextInput
         style={styles.input}
         placeholder="E-mail"
@@ -48,9 +57,22 @@ const LoginScreen = ({ navigation }) => {
         onChangeText={setSenha}
         secureTextEntry
       />
-      <Button title="Entrar" onPress={handleLogin} />
-      <Text style={styles.signupText}>
-        Não tem uma conta? <Text style={styles.signupLink} onPress={() => navigation.navigate('Signup')}>Cadastre-se</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Localização"
+        value={localizacao}
+        onChangeText={setLocalizacao}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Telefone"
+        value={telefone}
+        onChangeText={setTelefone}
+        keyboardType="phone-pad"
+      />
+      <Button title="Cadastrar" onPress={handleSignup} />
+      <Text style={styles.loginText}>
+        Já tem uma conta? <Text style={styles.loginLink}>Faça login</Text>
       </Text>
     </View>
   );
@@ -77,15 +99,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 5,
   },
-  signupText: {
+  loginText: {
     marginTop: 20,
     textAlign: "center",
     color: "#777",
   },
-  signupLink: {
+  loginLink: {
     color: "#1e90ff",
     fontWeight: "bold",
   },
 });
 
-export default LoginScreen;
+export default SignupScreen;
