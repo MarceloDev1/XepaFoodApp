@@ -16,7 +16,7 @@ const SignupScreen = () => {
     }
 
     try {
-      const response = await api.post('/api/Usuario/Cadastrar', {
+      const response = await api.post('/api/Usuario/CriarUsuario', {
         nome,
         email,
         senha,

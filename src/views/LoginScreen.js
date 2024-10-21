@@ -23,6 +23,7 @@ const LoginScreen = ({ navigation }) => {
       if (response.status === 200) {
         login(response.data.user);
         Alert.alert("Sucesso", "Login realizado com sucesso!");
+        navigation.navigate('Home'); // Redireciona para a tela Home
       }
     } catch (error) {
       console.error('Erro ao fazer login:', error);
@@ -51,6 +52,9 @@ const LoginScreen = ({ navigation }) => {
       <Button title="Entrar" onPress={handleLogin} />
       <Text style={styles.signupText}>
         Não tem uma conta? <Text style={styles.signupLink} onPress={() => navigation.navigate('Signup')}>Cadastre-se</Text>
+      </Text>
+      <Text style={styles.signupText}>
+        Não tem uma loja? <Text style={styles.signupLink} onPress={() => navigation.navigate('CadastrarLoja')}>Cadastrar Loja</Text>
       </Text>
     </View>
   );
