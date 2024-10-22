@@ -4,20 +4,29 @@ import api from '../services/axios';
 
 const CadastrarLojaScreen = ({ navigation }) => {
   const [nomeLoja, setNomeLoja] = useState("");
-  const [localizacao, setLocalizacao] = useState("");
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [localizacaoLoja, setLocalizacaoLoja] = useState("");
+  const [localizacaoUsuario, setLocalizacaoUsuario] = useState("");
   const [telefone, setTelefone] = useState("");
 
   const handleCadastrarLoja = async () => {
-    if (nomeLoja === "" || localizacao === "" || telefone === "") {
+    if (nomeLoja === "" || localizacaoLoja === "" || telefone === "") {
       Alert.alert("Erro", "Por favor, preencha todos os campos.");
       return;
     }
 
     try {
-      const response = await api.post('/api/Loja/CriarLoja', {
+      const response = await api.post('/api/Loja/CriarLojaEUsuario', {
         nomeLoja,
-        localizacao,
-        telefone
+        nome,
+        email,
+        senha,
+        localizacaoLoja,
+        localizacaoUsuario,
+        telefone,
+        feirante : true
       });
 
       if (response.status === 201) {
@@ -41,16 +50,39 @@ const CadastrarLojaScreen = ({ navigation }) => {
       />
       <TextInput
         style={styles.input}
-        placeholder="Localização"
-        value={localizacao}
-        onChangeText={setLocalizacao}
+        placeholder="Nome do Usuário"
+        value={nome}
+        onChangeText={setNome}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Senha"
+        value={senha}
+        onChangeText={setSenha}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Localização Loja"
+        value={localizacaoLoja}
+        onChangeText={setLocalizacaoLoja}
+      />
+       <TextInput
+        style={styles.input}
+        placeholder="Localização Usuário"
+        value={localizacaoUsuario}
+        onChangeText={setLocalizacaoUsuario}
       />
       <TextInput
         style={styles.input}
         placeholder="Telefone"
         value={telefone}
         onChangeText={setTelefone}
-        keyboardType="phone-pad"
       />
       <Button title="Cadastrar Loja" onPress={handleCadastrarLoja} />
     </View>
