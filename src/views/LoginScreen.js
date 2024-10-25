@@ -14,16 +14,28 @@ const LoginScreen = ({ navigation }) => {
       return;
     }
 
+
     try {
+      console.log("Tentando fazer login...");
       const response = await api.post('/api/Usuario/Login', {
         email: email,
         senha: senha,
       });
-
+      
       if (response.status === 200) {
-        login(response.data.user);
+        const usuario = response.data.usuario;
+        login(usuario);
+
+        if (usuario.feirante) {
+          navigation.navigate('FeiranteScreen', {usuario});
+        } else {
+          navigation.navigate('Home');
+        }
+
         Alert.alert("Sucesso", "Login realizado com sucesso!");
-        navigation.navigate('Home'); // Redireciona para a tela Home
+      } else {
+        console.log(response.data);
+        Alert.alert("Login inválido");
       }
     } catch (error) {
       console.error('Erro ao fazer login:', error);
