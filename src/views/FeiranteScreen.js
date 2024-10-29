@@ -10,10 +10,10 @@ const FeiranteScreen = ({ navigation }) => {
 
   useEffect(() => {    
     const unsubscribe = navigation.addListener('focus', () => {
-      fetchLojas(); // Atualiza as lojas quando a tela é focada
+      fetchLojas();
     });
 
-    return unsubscribe; // Limpa o listener ao desmontar
+    return unsubscribe;
   }, [navigation]);
 
 

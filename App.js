@@ -10,6 +10,7 @@ import CadastrarLojaScreen from './src/views/CadastrarLojaScreen';
 import EstoqueScreen from './src/views/EstoqueScreen';
 import FeiranteScreen from './src/views/FeiranteScreen';
 import EditarLojaScreen from './src/views/EditarLojaScreen';
+import EditarProdutoScreen from './src/views/EditarProdutoScreen';
 import CadastroLojaScreen from './src/views/CadastroLojaScreen';
 
 const Stack = createNativeStackNavigator();
@@ -22,12 +23,13 @@ export default function App() {
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Signup" component={SignupScreen} />
-          <Stack.Screen name="CadastrarProduto" component={CadastrarProdutoScreen} />
-          <Stack.Screen name="CadastrarLoja" component={CadastrarLojaScreen} />
-          <Stack.Screen name="Estoque" component={EstoqueScreen} />
+          <Stack.Screen name="CadastrarProdutoScreen" component={CadastrarProdutoScreen} />
           <Stack.Screen name="FeiranteScreen" component={FeiranteScreen} />
           <Stack.Screen name="EditarLojaScreen" component={EditarLojaScreen} />
+          <Stack.Screen name="CadastrarLoja" component={CadastrarLojaScreen} />
           <Stack.Screen name="CadastroLoja" component={CadastroLojaScreen} />
+          <Stack.Screen name="Estoque" component={EstoqueScreen} />
+          <Stack.Screen name="EditarProdutoScreen" component={EditarProdutoScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>

@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { createProduto } from '../services/ProdutoSevice';
 
-const CadastrarProdutoScreen = ({ navigation }) => {
+const CadastrarProdutoScreen = ({ navigation, route }) => {
+  const { idLoja } = route.params;
   const [nomeProduto, setNomeProduto] = useState('');
   const [descricao, setDescricao] = useState('');
   const [preco, setPreco] = useState('');
+  const [quantidade, setQuantidade] = useState('');
 
   const handleCadastro = async () => {
-    if (!nomeProduto || !descricao || !preco) {
+    if (!nomeProduto || !descricao || !preco || !quantidade) {
       Alert.alert('Erro', 'Preencha todos os campos.');
       return;
     }
@@ -17,12 +19,14 @@ const CadastrarProdutoScreen = ({ navigation }) => {
       nomeProduto,
       descricao,
       preco: parseFloat(preco),
+      quantidade: parseInt(quantidade, 10),
+      idLoja
     };
 
     try {
       await createProduto(produto);
       Alert.alert('Sucesso', 'Produto cadastrado com sucesso!');
-      navigation.goBack(); // Volta para a tela anterior (Home)
+      navigation.navigate('EditarLojaScreen', { idLoja, refresh: true });
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível cadastrar o produto.');
     }
@@ -49,6 +53,13 @@ const CadastrarProdutoScreen = ({ navigation }) => {
         value={preco}
         onChangeText={setPreco}
         keyboardType="decimal-pad"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Quantidade"
+        value={quantidade}
+        onChangeText={setQuantidade}
+        keyboardType="numeric"
       />
       <Button title="Cadastrar" onPress={handleCadastro} />
     </View>
