@@ -6,11 +6,39 @@ const SignupScreen = () => {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [localizacao, setLocalizacao] = useState("");
+  const [cep, setCEP] = useState("");
+  const [logradouro, setLogradouro] = useState("");
+  const [bairro, setBairro] = useState("");
+  const [uf, setUF] = useState("");
+  const [cidade, setCidade] = useState("");
   const [telefone, setTelefone] = useState("");
 
+  const handleCEPChange = async (cep) => {
+    setCEP(cep);
+    
+    if (cep.length === 8) { // Verifica se o CEP tem 8 dígitos
+      try {
+        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const data = await response.json();
+
+        if (data.erro) {
+          Alert.alert("Erro", "CEP não encontrado.");
+          return;
+        }
+
+        setLogradouro(data.logradouro || "");
+        setBairro(data.bairro || "");
+        setCidade(data.localidade || "");
+        setUF(data.uf || "");
+      } catch (error) {
+        console.error("Erro ao buscar endereço:", error);
+        Alert.alert("Erro", "Não foi possível buscar o endereço. Tente novamente.");
+      }
+    }
+  };
+
   const handleSignup = async () => {
-    if (!nome || !email || !senha || !localizacao || !telefone) {
+    if (!nome || !email || !senha || !cep || !telefone) {
       Alert.alert("Erro", "Por favor, preencha todos os campos.");
       return;
     }
@@ -20,7 +48,11 @@ const SignupScreen = () => {
         nome,
         email,
         senha,
-        localizacao,
+        cep, 
+        logradouro, 
+        bairro, 
+        cidade,
+        uf,
         telefone,
       });
 
@@ -59,9 +91,35 @@ const SignupScreen = () => {
       />
       <TextInput
         style={styles.input}
-        placeholder="Localização"
-        value={localizacao}
-        onChangeText={setLocalizacao}
+        placeholder="CEP"
+        value={cep}
+        onChangeText={handleCEPChange}
+        keyboardType="numeric"
+        maxLength={8}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Logradouro"
+        value={logradouro}
+        onChangeText={setLogradouro}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Bairro"
+        value={bairro}
+        onChangeText={setBairro}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="UF"
+        value={uf}
+        onChangeText={setUF}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Cidade"
+        value={cidade}
+        onChangeText={setCidade}
       />
       <TextInput
         style={styles.input}
