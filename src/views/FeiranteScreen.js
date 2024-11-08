@@ -1,91 +1,74 @@
-import React, { useEffect, useState } from 'react';
-import { CheckBox, View, Text, FlatList, StyleSheet, Alert, TouchableOpacity } from 'react-native';
-import api from '../services/axios';
-import { useAuth } from '../context/AuthContext';
+import React, { useState } from "react";
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, FlatList, Alert } from "react-native";
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import api from '../services/axios';
 
-const FeiranteScreen = ({ navigation }) => {
-  const { user } = useAuth();
-  const [lojas, setLojas] = useState([]);
+const HomeScreen = ({ navigation }) => {
+  const [localizacao, setLocalizacao] = useState('');
+  const [produto, setProduto] = useState('');
+  const [resultados, setResultados] = useState([]);
 
-  useEffect(() => {    
-    const unsubscribe = navigation.addListener('focus', () => {
-      fetchLojas();
-    });
-
-    return unsubscribe;
-  }, [navigation]);
-
+  const handlePesquisa = async () => {
+    try {
+      const response = await api.get(`/api/Estoque/RetornarEstoque`, {
+        params: {
+          nomeProduto: produto,
+          localizacao: localizacao,
+        },
+      });
+      setResultados(response.data);
+      console.log("Resultado da pesquisa:", response.data);
+    } catch (error) {
+      console.error("Erro ao pesquisar:", error);
+      Alert.alert("Erro", "Não foi possível realizar a pesquisa.");
+    }
+  };
 
   const handleEdit = (idLoja) => {
     console.log(idLoja);
     navigation.navigate('EditarLojaScreen', { idLoja });
   };
 
-  const handleDelete = async (idLoja) => {
-    try {
-      const response = await api.post(`/api/Loja/ExcluirLoja?idLoja=${idLoja}`);
-
-      if (response.status === 200) {
-        Alert.alert('Sucesso', `Loja com ID: ${idLoja} foi deletada.`);
-        // Remove a loja da lista de lojas localmente
-        fetchLojas();
-      } else {
-        Alert.alert('Erro', 'Não foi possível deletar a loja.');
-      }
-    } catch (error) {
-      console.error('Erro ao deletar a loja:', error);
-      Alert.alert('Erro', 'Erro ao deletar a loja.');
-    }
-  };
-
-  const fetchLojas = async () => {
-    try {
-      const response = await api.get(`/api/Loja/RetornarLojaPorIdUsuario?idUsuario=${user.idUsuario}`);
-      if (response.status === 200) {
-        setLojas(response.data);
-      } else {
-        Alert.alert('Erro', 'Não foi possível carregar as lojas.');
-      }
-    } catch (error) {
-      console.error('Erro ao buscar lojas:', error);
-      Alert.alert('Erro', 'Erro ao carregar as lojas.');
-    }
-  };
-
-
-
-  const renderLoja = ({ item }) => (
-    <View style={styles.card}>
-      <View style={styles.info}>
-        <Text style={styles.cardTitle}>{item.nomeLoja}</Text>
-        <Text style={styles.cardSubtitle}>{item.localizacao}</Text>
-      </View>
-      <TouchableOpacity onPress={() => handleEdit(item.idLoja)}>
-        <Icon name="edit" size={24} color="blue" style={styles.icon} />
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => handleDelete(item.idLoja)}>
-        <Icon name="delete" size={24} color="red" style={styles.icon} />
-      </TouchableOpacity>
-    </View>
-  );
-
-  const handleAddLoja = () => {
-    navigation.navigate('CadastroLoja', { idUsuario: user.idUsuario });
-  };
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Lojas Disponíveis</Text>
-      <FlatList
-        data={lojas}
-        keyExtractor={(item) => item.idLoja.toString()}
-        renderItem={renderLoja}
-        contentContainerStyle={styles.grid}
+      <Text style={styles.title}>Bem-vindo à Home!</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Localização"
+        value={localizacao}
+        onChangeText={setLocalizacao}
       />
-      <TouchableOpacity style={styles.addButton} onPress={handleAddLoja}>
-        <Text style={styles.addButtonText}>Adicionar Loja</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Nome do Produto"
+        value={produto}
+        onChangeText={setProduto}
+      />
+
+      <TouchableOpacity style={styles.searchButton} onPress={handlePesquisa}>
+        <Icon name="search" size={24} color="#fff" />
+        <Text style={styles.searchButtonText}>Pesquisar</Text>
       </TouchableOpacity>
+
+      {resultados.length > 0 ? (
+        <FlatList
+          data={resultados}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.resultItem}
+              onPress={() => handleEdit(item.idLoja)}  // Usa handleEdit ao clicar no cartão
+            >
+              <Text style={styles.resultText}>Nome da Loja: {item.nomeLoja}</Text>
+              <Text style={styles.resultText}>Localização: {item.localizacao}</Text>
+            </TouchableOpacity>
+          )}
+        />
+      ) : (
+        <Text style={styles.noResultsText}>Nenhum resultado encontrado</Text>
+      )}
     </View>
   );
 };
@@ -93,50 +76,55 @@ const FeiranteScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    padding: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
     marginBottom: 20,
   },
-  grid: {
-    paddingBottom: 10,
+  input: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    width: '100%',
   },
-  card: {
+  searchButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f8f8f8',
-    padding: 20,
-    margin: 10,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    backgroundColor: '#4CAF50',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 15,
+    width: '100%',
   },
-  info: {
-    flex: 1,
-    marginLeft: 10,
-  },
-  cardTitle: {
+  searchButtonText: {
+    color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 5,
+    marginLeft: 5,
   },
-  cardSubtitle: {
-    fontSize: 14,
-    color: '#777',
+  resultItem: {
+    padding: 15,
+    borderRadius: 8,
+    backgroundColor: '#f5f5f5',
+    marginVertical: 5,
+    width: '100%',
   },
-  icon: {
-    marginLeft: 10,
+  resultText: {
+    fontSize: 16,
   },
-  checkbox: {
-    alignSelf: 'center'
-  }
+  noResultsText: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 20,
+  },
 });
 
-export default FeiranteScreen;
+export default HomeScreen;

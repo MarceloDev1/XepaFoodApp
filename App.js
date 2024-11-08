@@ -10,6 +10,7 @@ import CadastrarLojaScreen from './src/views/CadastrarLojaScreen';
 import EstoqueScreen from './src/views/EstoqueScreen';
 import FeiranteScreen from './src/views/FeiranteScreen';
 import EditarLojaScreen from './src/views/EditarLojaScreen';
+import ComprarScreen from './src/views/ComprarScreen';
 import EditarProdutoScreen from './src/views/EditarProdutoScreen';
 import CadastroLojaScreen from './src/views/CadastroLojaScreen';
 
@@ -30,6 +31,7 @@ export default function App() {
           <Stack.Screen name="CadastroLoja" component={CadastroLojaScreen} />
           <Stack.Screen name="Estoque" component={EstoqueScreen} />
           <Stack.Screen name="EditarProdutoScreen" component={EditarProdutoScreen} />
+          <Stack.Screen name="ComprarScreen" component={ComprarScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>

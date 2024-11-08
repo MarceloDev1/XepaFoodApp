@@ -6,7 +6,7 @@ import api from '../services/axios';
 const HomeScreen = ({ navigation }) => {
   const [localizacao, setLocalizacao] = useState('');
   const [produto, setProduto] = useState('');
-  const [resultados, setResultados] = useState([]);  // Estado para armazenar o resultado da pesquisa
+  const [resultados, setResultados] = useState([]);
 
   const handlePesquisa = async () => {
     try {
@@ -16,8 +16,6 @@ const HomeScreen = ({ navigation }) => {
           localizacao: localizacao,
         },
       });
-      
-      // Atualiza o estado 'resultados' com a resposta da pesquisa
       setResultados(response.data);
       console.log("Resultado da pesquisa:", response.data);
     } catch (error) {
@@ -26,11 +24,14 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
+  const handlePressItem = (idLoja) => {
+    navigation.navigate("ComprarScreen", { idLoja });
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Bem-vindo à Home!</Text>
 
-      {/* Filtro por localização */}
       <TextInput
         style={styles.input}
         placeholder="Localização"
@@ -38,7 +39,6 @@ const HomeScreen = ({ navigation }) => {
         onChangeText={setLocalizacao}
       />
 
-      {/* Filtro por produto */}
       <TextInput
         style={styles.input}
         placeholder="Nome do Produto"
@@ -46,26 +46,23 @@ const HomeScreen = ({ navigation }) => {
         onChangeText={setProduto}
       />
 
-      {/* Botão de pesquisa */}
       <TouchableOpacity style={styles.searchButton} onPress={handlePesquisa}>
         <Icon name="search" size={24} color="#fff" />
         <Text style={styles.searchButtonText}>Pesquisar</Text>
       </TouchableOpacity>
 
-      {/* Exibe os resultados da pesquisa */}
       {resultados.length > 0 ? (
         <FlatList
           data={resultados}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
-            <View style={styles.resultItem}>
-              <Text style={styles.resultText}>Nome do Produto: {item.nomeProduto}</Text>
-              <Text style={styles.resultText}>Descrição: {item.descricaoProduto}</Text>
+            <TouchableOpacity
+              style={styles.resultItem}
+              onPress={() => handlePressItem(item.idLoja)}
+            >
               <Text style={styles.resultText}>Nome da Loja: {item.nomeLoja}</Text>
-              <Text style={styles.resultText}>Localização: {item.localizacaoLoja}</Text>
-              <Text style={styles.resultText}>Preço: R$ {item.preco}</Text>
-              <Text style={styles.resultText}>Quantidade: {item.quantidade}</Text>
-            </View>
+              <Text style={styles.resultText}>Localização: {item.localizacao}</Text>
+            </TouchableOpacity>
           )}
         />
       ) : (
@@ -113,9 +110,10 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   resultItem: {
-    padding: 10,
-    borderBottomColor: '#ccc',
-    borderBottomWidth: 1,
+    padding: 15,
+    borderRadius: 8,
+    backgroundColor: '#f5f5f5',
+    marginVertical: 5,
     width: '100%',
   },
   resultText: {
